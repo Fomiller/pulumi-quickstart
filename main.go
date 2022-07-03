@@ -22,6 +22,7 @@ func main() {
 
 		// Create an AWS resource (S3 Bucket)
 		bucket, err := s3.NewBucket(ctx, "my-pulumi-bucket", &s3.BucketArgs{
+			Bucket: pulumi.String("my-pulumi-bucket"),
 			Website: s3.BucketWebsiteArgs{
 				IndexDocument: pulumi.String("index.html"),
 			},
