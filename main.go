@@ -7,13 +7,27 @@ import (
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		// Create state bucket
+		// Bucket was created manually and then imported using pulumi cli
+		// imported resources are marked as protected, remove pulumi.Protect(true) to destroy resource
+		_, err := s3.NewBucket(ctx, "fomiller-pulumi-state", &s3.BucketArgs{
+			Arn:          pulumi.String("arn:aws:s3:::fomiller-pulumi-state"),
+			Bucket:       pulumi.String("fomiller-pulumi-state"),
+			HostedZoneId: pulumi.String("Z3AQBSTGFYJSTF"),
+			RequestPayer: pulumi.String("BucketOwner"),
+		}, pulumi.Protect(true))
+		if err != nil {
+			return err
+		}
+
 		// Create an AWS resource (S3 Bucket)
-		bucket, err := s3.NewBucket(ctx, "fomiller-pulumi-state", &s3.BucketArgs{
+		bucket, err := s3.NewBucket(ctx, "my-pulumi-bucket", &s3.BucketArgs{
 			Website: s3.BucketWebsiteArgs{
 				IndexDocument: pulumi.String("index.html"),
 			},
 		})
 
+		// Create bucket object and serve as static web page
 		_, err = s3.NewBucketObject(ctx, "index.html", &s3.BucketObjectArgs{
 			Acl:         pulumi.String("public-read"),
 			ContentType: pulumi.String("text/html"),
